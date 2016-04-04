@@ -449,10 +449,15 @@ Foam::surfaceToCell::surfaceToCell
     ),
     nearDist_(readScalar(dict.lookup("nearDistance"))),
     curvature_(readScalar(dict.lookup("curvature"))),
-    surfPtr_(new triSurface(surfName_)),
-    querySurfPtr_(new triSurfaceSearch(*surfPtr_)),
+    surfPtr_(NULL),
+    querySurfPtr_(NULL),
     IOwnPtrs_(true)
 {
+    surfName_.expand();
+
+    surfPtr_ = new triSurface(surfName_);
+    querySurfPtr_ = new triSurfaceSearch(*surfPtr_);
+
     checkSettings();
 }
 

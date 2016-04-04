@@ -69,7 +69,7 @@ class surfaceToCell
         static addToUsageTable usage_;
 
         //- Name of surface file
-        const fileName surfName_;
+        fileName surfName_;
 
         //- Points which are outside
         const pointField outsidePoints_;
