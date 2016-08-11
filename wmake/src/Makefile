@@ -2,7 +2,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+#   \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
 #    \\/     M anipulation  |
 #------------------------------------------------------------------------------
 # License
@@ -36,30 +36,28 @@
 SHELL      = /bin/sh
 
 #------------------------------------------------------------------------------
-# Initialise suffices list
+# Unset suffices list (suffix rules are not used)
 #------------------------------------------------------------------------------
 
 .SUFFIXES:
-.SUFFIXES: .o
 
 
 #------------------------------------------------------------------------------
-# set compilation and dependency building rules
+# Set compilation and dependency building rules
 #------------------------------------------------------------------------------
 
-GENERAL_RULES = $(WM_DIR)/rules/General
-RULES         = $(WM_DIR)/rules/$(WM_ARCH)$(WM_COMPILER)
-WMAKE_BIN     = $(WM_DIR)/platforms/$(WM_ARCH)$(WM_COMPILER)
+# Locally set optimized compilation
+WM_COMPILE_OPTION = Opt
 
-include $(RULES)/general
-include $(RULES)/$(WM_LINK_LANGUAGE)
+GENERAL_RULES   = $(WM_DIR)/rules/General
+include $(GENERAL_RULES)/general
 
 
 #------------------------------------------------------------------------------
-# targets
+# Targets
 #------------------------------------------------------------------------------
 
-all:  $(WMAKE_BIN)/dirToString $(WMAKE_BIN)/wmkdep $(WMAKE_BIN)/wmkdepend
+all:  $(WMAKE_BIN)/dirToString $(WMAKE_BIN)/wmkdep
 
 clean:
 	rm -f $(WMAKE_BIN)/* 2>/dev/null
@@ -76,14 +74,5 @@ $(WMAKE_BIN)/wmkdep: wmkdep.l
 	$(cc) $(cFLAGS) lex.yy.c -o $(WMAKE_BIN)/wmkdep
 	@rm -f lex.yy.c 2>/dev/null
 
-
-# for bootstrapping - use generated files directly (instead of from .atg file)
-$(WMAKE_BIN)/wmkdepend: wmkdepend.cpp \
-    wmkdependParser.cpp wmkdependScanner.cpp \
-    wmkdependParser.h   wmkdependScanner.h
-	@mkdir -p $(WMAKE_BIN)
-	$(CC) $(c++FLAGS) \
-	     wmkdepend.cpp wmkdependParser.cpp wmkdependScanner.cpp \
-	    -o $(WMAKE_BIN)/wmkdepend
 
 #------------------------------------------------------------------------------

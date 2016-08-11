@@ -3,7 +3,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+#   \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
 # License
@@ -25,32 +25,40 @@
 # Script
 #     wmakeLnIncludeAll
 #
+# Usage
+#     wmakeLnIncludeAll [dir1 .. dirN]
+#
 # Description
 #     Find directories with a 'Make/files' that contains a 'LIB =' directive
-#     and execute 'wmakeLnInclude -f' for each one
+#     and execute 'wmakeLnInclude -update' for each one
 #
 #------------------------------------------------------------------------------
+Script=${0##*/}
+
 usage() {
     while [ "$#" -ge 1 ]; do echo "$1"; shift; done
     cat<<USAGE
 
-usage: ${0##*/} [dir1 .. dirN]
+Usage: $Script [dir1 .. dirN]
 
     Find directories with a 'Make/files' that contains a 'LIB =' directive
-    and execute 'wmakeLnInclude -f' for each one
+    and execute 'wmakeLnInclude -update' for each one
 
 USAGE
     exit 1
 }
 
+
 #------------------------------------------------------------------------------
+# Parse arguments and options
+#------------------------------------------------------------------------------
+
 findName=lnInclude
 
-# simple parse options
 while [ "$#" -gt 0 ]
 do
     case "$1" in
-    -h | -help)   # provide immediate help
+    -h | -help)   # Provide immediate help
         usage
         ;;
     -*)
@@ -63,17 +71,17 @@ do
 done
 
 
-# default to searching from pwd
+# Default to searching from CWD
 [ "$#" -gt 0 ] || set -- .
 
 for checkDir
 do
     if [ -d $checkDir ]
     then
-        echo "searching: $checkDir for 'Make' directories"
+        echo "Searching: $checkDir for 'Make' directories"
         echo "---------"
     else
-        echo "skipping non-dir: $checkDir"
+        echo "Skipping non-dir: $checkDir"
         echo "----------------"
         continue
     fi
@@ -85,7 +93,7 @@ do
         then
             if grep -e '^ *LIB *=' "$MakeDir/files" >/dev/null 2>&1
             then
-                wmakeLnInclude -f $topDir
+                wmakeLnInclude -update $topDir
             elif [ -d "$topDir/lnInclude" ]
             then
                 echo "removing spurious $topDir/lnInclude"
@@ -94,5 +102,13 @@ do
         fi
     done
 done
+
+
+#------------------------------------------------------------------------------
+# Cleanup local variables and functions
+#------------------------------------------------------------------------------
+
+unset Script usage
+
 
 #------------------------------------------------------------------------------

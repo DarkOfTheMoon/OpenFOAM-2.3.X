@@ -3,7 +3,7 @@
 # =========                 |
 # \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
 #  \\    /   O peration     |
-#   \\  /    A nd           | Copyright (C) 2011 OpenFOAM Foundation
+#   \\  /    A nd           | Copyright (C) 2011-2016 OpenFOAM Foundation
 #    \\/     M anipulation  |
 #-------------------------------------------------------------------------------
 # License
@@ -25,17 +25,18 @@
 # Script
 #     wmakeLnInclude
 #
+# Usage
+#     wmakeLnInclude [-u | -update] [-s | -silent] <dir>
+#
 # Description
 #     Link all the source files in the <dir> directory into <dir>/lnInclude
-#
-#     Usage: wmakeLnInclude [-f] <dir>
 #
 #     The desired source files:
 #         *.C *.H *.h *.cpp *.cxx *.hpp *.hxx
 #
 #     Avoid
 #         *.c (C source)
-#         .#* (cvs recovered files)
+#
 #------------------------------------------------------------------------------
 Script=${0##*/}
 
@@ -47,39 +48,41 @@ usage() {
 Usage: $Script [OPTION] dir
 
 options:
-  -f | -force       force update
+  -u | -update      update
   -s | -silent      use 'silent' mode (do not echo command)
   -help             print the usage
 
     Link all the source files in the <dir> into <dir>/lnInclude
 
 Note
-    The '-f' option forces an update when the lnInclude directory already exists
+    The '-u' option forces an update when the lnInclude directory already exists
     and changes the default linking from 'ln -s' to 'ln -sf'.
 
 USAGE
     exit 1
 }
 
+
+#------------------------------------------------------------------------------
+# Parse arguments and options
 #------------------------------------------------------------------------------
 
-# default 'find' option
+# Default 'find' option
 unset findOpt
 
-# default 'ln' option
+# Default 'ln' option
 lnOpt="-s"
 
-unset forceUpdate silentOpt
+unset update silentOpt
 
-# simple parse options
 while [ "$#" -gt 0 ]
 do
     case "$1" in
-    -h | -help)   # provide immediate help
+    -h | -help)   # Provide immediate help
         usage
         ;;
-    -f | -force)
-        forceUpdate=true
+    -u | -update)
+        update=true
         lnOpt="-sf"
         shift
         ;;
@@ -100,11 +103,11 @@ if [ $# -eq 1 ]
 then
     baseDir=$1
 else
-    usage "ERROR: incorrect number of arguments"
+    usage "Error: incorrect number of arguments"
 fi
 
 
-# convert incorrect path/dir/lnInclude to something sensible
+# Convert incorrect path/dir/lnInclude to something sensible
 while [ "${baseDir##*/}" = lnInclude ]
 do
     baseDir="${baseDir%/*}"
@@ -123,7 +126,7 @@ incDir=$baseDir/lnInclude
 
 if [ -d $incDir ]
 then
-    [ "$forceUpdate" = true ] || {
+    [ "$update" = true ] || {
         # echo "$Script error: include directory $incDir already exists" 1>&2
         exit 0
     }
@@ -138,25 +141,39 @@ fi
 
 cd $incDir || exit 1
 
-#------------------------------------------------------------------------------
-
 if [ "$silentOpt" != true ]
 then
     echo "$Script: linking include files to $incDir" 1>&2
 fi
 
-#
-# remove any broken links first (this helps when file locations have moved)
-#
-find -L . -type l -exec rm {} \;
 
-#
-# create links, avoid recreating links unless necessary
+#------------------------------------------------------------------------------
+# Remove any broken links first (this helps when file locations have moved)
+#------------------------------------------------------------------------------
+find -L . -type l | xargs rm -f
+
+
+#------------------------------------------------------------------------------
+# Create links, avoid recreating links unless necessary
 # things placed in the 'noLink' directory are skipped
-#
+#------------------------------------------------------------------------------
 find .. $findOpt \
-    \( -name lnInclude -o -name Make -o -name config -o -name noLink \) -prune \
- -o \( -name '*.[CHh]' -o -name '*.[ch]xx' -o -name '*.[ch]pp' -o -name '*.type' \)  \
- -exec ln $lnOpt {} . \;
+     \( -name lnInclude -o -name Make -o -name config -o -name noLink \) \
+     -prune \
+     -o \( \
+     -name '*.[CHh]' \
+     -o -name '*.[ch]xx' \
+     -o -name '*.[ch]pp' \
+     -o -name '*.type' \
+     \)  \
+     -exec ln $lnOpt {} . \;
+
+
+#------------------------------------------------------------------------------
+# Cleanup local variables and functions
+#------------------------------------------------------------------------------
+
+unset Script usage
+
 
 #------------------------------------------------------------------------------
