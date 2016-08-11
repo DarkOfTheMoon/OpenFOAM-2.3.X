@@ -26,11 +26,11 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "mpi.h"
-
 #include "UIPstream.H"
 #include "PstreamGlobals.H"
 #include "IOstreams.H"
+
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * Constructor * * * * * * * * * * * * * * * //
 

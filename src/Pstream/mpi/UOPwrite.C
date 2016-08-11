@@ -26,10 +26,10 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-#include "mpi.h"
-
 #include "UOPstream.H"
 #include "PstreamGlobals.H"
+
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * //
 

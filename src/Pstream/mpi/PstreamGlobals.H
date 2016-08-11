@@ -36,9 +36,9 @@ SourceFiles
 #ifndef PstreamGlobals_H
 #define PstreamGlobals_H
 
-#include "mpi.h"
-
 #include "DynamicList.H"
+
+#include <mpi.h>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
