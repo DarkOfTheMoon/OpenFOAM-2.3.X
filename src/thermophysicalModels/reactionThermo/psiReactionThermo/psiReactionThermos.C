@@ -32,6 +32,7 @@ License
 #include "perfectGas.H"
 #include "hConstThermo.H"
 #include "janafThermo.H"
+#include "absoluteEnthalpy.H"
 #include "sensibleEnthalpy.H"
 #include "thermo.H"
 #include "constTransport.H"
@@ -52,6 +53,21 @@ namespace Foam
 {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+//for flamelet model
+
+makeReactionThermo
+(
+    psiThermo,
+    psiReactionThermo,
+    hePsiThermo,
+    multiComponentMixture,
+    sutherlandTransport,
+    absoluteEnthalpy,
+    janafThermo,
+    perfectGas,
+    specie
+);
 
 // constTransport, hConstThermo
 
